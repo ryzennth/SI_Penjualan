@@ -13,21 +13,21 @@ return new class extends Migration
     {
         Schema::create('product_transactions', function (Blueprint $table) {
             $table->id();
-            $table->string(column: 'name');
-            $table->string(column: 'phone');
-            $table->string(column: 'email');
-            $table->string(column: 'booking_trx_id');
-            $table->string(column: 'city');
-            $table->string(column: 'post_code');
-            $table->string(column: 'proof');
-            $table->unsignedBigInteger(column: 'produk_size');
+            $table->string('name');
+            $table->string('phone');
+            $table->string('email');
+            $table->string('booking_trx_id');
+            $table->string('city');
+            $table->string('post_code');
+            $table->string('proof');
+            $table->unsignedBigInteger('produk_size');
             $table->text(column: 'address');
-            $table->unsignedBigInteger(column: 'quantity');
-            $table->unsignedBigInteger(column: 'sub_total_amount');
-            $table->unsignedBigInteger(column: 'grand_total_amount');
-            $table->boolean(column: 'is_paid');
-            $table->foreignId(column: 'produk_id')->constrained()->cascadeOnDelete();
-            $table->foreignId(column: 'promo_code_id')->nullable()->constrained()->nullonDelete();
+            $table->unsignedBigInteger('quantity');
+            $table->unsignedBigInteger('sub_total_amount');
+            $table->unsignedBigInteger('grand_total_amount');
+            $table->boolean('is_paid');
+            $table->foreignId('produk_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('promo_code_id')->nullable()->constrained()->nullonDelete();
             $table->softDeletes();
             $table->timestamps();
         });
