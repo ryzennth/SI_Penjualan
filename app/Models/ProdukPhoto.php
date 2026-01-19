@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Produk;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ProdukPhoto extends Model
 {
@@ -14,4 +16,10 @@ class ProdukPhoto extends Model
         'photo',
         'produk_id',
     ];
+
+    public function produk(): BelongsTo
+    {
+        return $this->belongsTo(Produk::class, foreignKey: 'produk_id');
+    }
+
 }

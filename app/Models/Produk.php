@@ -34,12 +34,12 @@ class Produk extends Model
 
     public function category(): BelongsTo
     {
-        return $this->belongsTo(Brand::class, foreignKey: 'brand_id');
+        return $this->belongsTo(Category::class, foreignKey: 'category_id');
     }
 
     public function brand(): BelongsTo
     {
-        return $this->belongsTo(Category::class, foreignKey: 'category_id');
+        return $this->belongsTo(Brand::class, foreignKey: 'brand_id');
     }
     public function photos(): HasMany
     {
