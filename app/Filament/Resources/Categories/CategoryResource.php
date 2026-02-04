@@ -20,27 +20,34 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CategoryResource extends Resource
 {
+    // Model utama yang dikelola oleh resource ini.
     protected static ?string $model = Category::class;
 
+    // Ikon navigasi di sidebar untuk menu Category.
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTag;
 
+    // Atribut yang ditampilkan sebagai judul record.
     protected static ?string $recordTitleAttribute = 'Category';
 
+    // Konfigurasi form untuk create/edit kategori.
     public static function form(Schema $schema): Schema
     {
         return CategoryForm::configure($schema);
     }
 
+    // Konfigurasi infolist untuk tampilan detail kategori.
     public static function infolist(Schema $schema): Schema
     {
         return CategoryInfolist::configure($schema);
     }
 
+    // Konfigurasi tabel daftar kategori.
     public static function table(Table $table): Table
     {
         return CategoriesTable::configure($table);
     }
 
+    // Relasi resource (kosong jika tidak ada).
     public static function getRelations(): array
     {
         return [
@@ -48,6 +55,7 @@ class CategoryResource extends Resource
         ];
     }
 
+    // Mapping halaman resource.
     public static function getPages(): array
     {
         return [
@@ -58,6 +66,7 @@ class CategoryResource extends Resource
         ];
     }
 
+    // Mengambil query record tanpa scope soft delete bawaan.
     public static function getRecordRouteBindingEloquentQuery(): Builder
     {
         return parent::getRecordRouteBindingEloquentQuery()

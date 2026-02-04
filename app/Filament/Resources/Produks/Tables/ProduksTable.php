@@ -20,54 +20,73 @@ class ProduksTable
     {
         return $table
             ->columns([
+                // Kolom nama produk yang bisa dicari.
                 TextColumn::make('name')
                     ->searchable(),
+                // Kolom foto produk (1 foto ditampilkan, sisanya diringkas).
                 ImageColumn::make('photos.photo')
                     ->circular()
                     ->stacked()
                     ->Limit(1)
                     ->LimitedRemainingText(),
+                // Kolom thumbnail produk berbentuk kotak.
                 ImageColumn::make('thumbnail')
                     ->square(),
+                // Kolom harga produk dalam format uang.
                 TextColumn::make('price')
                     ->money()
                     ->sortable(),
+                // Kolom ukuran produk.
                 TextColumn::make('sizes.size')
                     ->searchable()
                     ->sortable(),
+                // Kolom stok produk.
                 TextColumn::make('stock')
                     ->numeric()
                     ->sortable(),
+                // Kolom brand terkait.
                 TextColumn::make('brand.name')
                     ->searchable(),
+                // Kolom kategori terkait.
                 TextColumn::make('category.name')
                     ->searchable(),
-                    TextColumn::make('deleted_at')
+                // Kolom waktu penghapusan (soft delete), disembunyikan default.
+                TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                    TextColumn::make('created_at')
+                // Kolom waktu dibuat, disembunyikan default.
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                    TextColumn::make('updated_at')
+                // Kolom waktu diubah, disembunyikan default.
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                    IconColumn::make('is_popular')
-                        ->boolean(),
+                // Kolom status produk populer.
+                IconColumn::make('is_popular')
+                    ->boolean(),
                     ])
             ->filters([
+                // Filter untuk menampilkan data yang dihapus (trash).
                 TrashedFilter::make(),
             ])
             ->recordActions([
+                // Aksi lihat detail produk.
                 ViewAction::make(),
+                // Aksi edit produk.
                 EditAction::make(),
             ])
             ->toolbarActions([
+                // Kumpulan aksi massal untuk data terpilih.
                 BulkActionGroup::make([
+                    // Hapus massal (soft delete).
                     DeleteBulkAction::make(),
+                    // Hapus permanen massal.
                     ForceDeleteBulkAction::make(),
+                    // Pulihkan data yang dihapus.
                     RestoreBulkAction::make(),
                 ]),
             ]);

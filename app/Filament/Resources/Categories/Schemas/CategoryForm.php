@@ -12,9 +12,12 @@ class CategoryForm
     {
         return $schema
             ->components([
+                // Input nama kategori: wajib diisi dengan batas 255 karakter.
                 TextInput::make('name')
                     ->required()
                     ->maxLength(length: 255),
+                // Upload ikon kategori: hanya gambar, disimpan di folder categories, ukuran maks 1MB.
+                // Field ini wajib, namun menerima nilai null saat tidak ada unggahan.
                 FileUpload::make('icon')
                     ->image()
                     ->directory( 'categories')

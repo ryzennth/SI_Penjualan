@@ -22,9 +22,11 @@ class ProductTransactionForm
     {
         return $schema
             ->components([
+                // Wizard untuk membagi form transaksi ke beberapa langkah.
                 Wizard::make([
                     Step::make('Product and Price')
                     ->components([
+                        // Pilih produk, lalu hitung otomatis harga, subtotal, diskon, dan ukuran yang tersedia.
                         Select::make('produk_id')
                             ->relationship('produk', 'name')
                             ->required()
@@ -49,6 +51,7 @@ class ProductTransactionForm
 
                             })
 
+                            // Saat edit data, preload ukuran produk sesuai produk yang sudah dipilih.
                             ->afterStateHydrated( function ($state, callable $get, callable $set) {
                                 $produkId = $state;
                                 if ($produkId) {
@@ -59,6 +62,7 @@ class ProductTransactionForm
                             }
                         }),
 
+                        // Pilih ukuran produk dari daftar yang diisi otomatis.
                         Select::make('produk_size')
                             ->options( function (callable $get) {
                                 $sizes = $get('produk_size');
@@ -67,6 +71,7 @@ class ProductTransactionForm
                             ->required()
                             ->live(),
 
+                        // Jumlah produk, memicu perhitungan subtotal dan grand total.
                         Select::make('quantity')
                             ->required()
                             
@@ -83,7 +88,8 @@ class ProductTransactionForm
 
                             }),
 
-                            Select::make('promo_code_id')
+                        // Pilih promo code untuk mengisi diskon otomatis.
+                        Select::make('promo_code_id')
                             ->relationship('promoCode', 'id')
                             ->required()
                             ->preload()
@@ -97,11 +103,13 @@ class ProductTransactionForm
                                 $set('grand_total_amount', $grand_total_amount);
                             }),
 
+                            // Subtotal otomatis dari harga x jumlah.
                             TextInput::make('sub_total_amount')
                                 ->required()
                                 ->numeric()
                                 ->readOnly()
                                 ->prefix( 'IDR'),
+                            // Nominal diskon yang diterapkan.
                             TextInput::make( 'discount_amount')
                                 ->label('Discount Amount')
                                 ->required()
@@ -113,24 +121,31 @@ class ProductTransactionForm
 
                 Step::make( 'Customer Information')
                     ->components([
+                        // Informasi pelanggan ditata dalam grid 2 kolom.
                         Grid::make( 2)
                         ->components([
+                            // Nama pelanggan.
                             TextInput::make('name')
                                 ->required()
                                 ->maxLength( 255),
+                            // Email pelanggan.
                             TextInput::make('email')
                                 ->required()
                                 ->email()
                                 ->maxLength( 255),
+                            // Nomor telepon pelanggan.
                             TextInput::make('phone')
                                 ->required()
                                 ->maxLength(20),
+                            // Alamat pelanggan.
                             TextInput::make('address')
                                 ->required()
                                 ->maxLength(500),
+                            // Kota pelanggan.
                             TextInput::make('city')
                                 ->required()
                                 ->maxLength(100),
+                            // Kode pos pelanggan.
                             TextInput::make('post_code')
                                 ->required()
                                 ->maxLength(20),
@@ -138,9 +153,11 @@ class ProductTransactionForm
                     ]),
                 Step::make('Payment Information')
                     ->components([
+                        // Kode booking transaksi.
                         TextInput::make('booking_trx_id')
                             ->required()
                             ->maxLength(200),
+                        // Status pembayaran menggunakan tombol pilihan.
                         ToggleButtons::make('is_paid')
                             ->label('Apakah Sudah Membayar')
                             ->boolean()
@@ -151,6 +168,7 @@ class ProductTransactionForm
                                 false => 'heroicon-o-clock',
                             ])
                             ->required(),
+                        // Bukti pembayaran berupa gambar.
                         FileUpload::make('proof')
                             ->required()
                             ->image(),

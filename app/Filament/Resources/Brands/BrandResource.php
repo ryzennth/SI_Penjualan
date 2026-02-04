@@ -20,27 +20,34 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class BrandResource extends Resource
 {
+    // Model utama yang dikelola oleh resource ini.
     protected static ?string $model = Brand::class;
 
+    // Ikon navigasi di sidebar untuk menu Brand.
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCurrencyDollar;
 
+    // Atribut yang ditampilkan sebagai judul record.
     protected static ?string $recordTitleAttribute = 'Brand';
 
+    // Konfigurasi form untuk create/edit brand.
     public static function form(Schema $schema): Schema
     {
         return BrandForm::configure($schema);
     }
 
+    // Konfigurasi infolist untuk tampilan detail brand.
     public static function infolist(Schema $schema): Schema
     {
         return BrandInfolist::configure($schema);
     }
 
+    // Konfigurasi tabel daftar brand.
     public static function table(Table $table): Table
     {
         return BrandsTable::configure($table);
     }
 
+    // Relasi resource (kosong jika tidak ada).
     public static function getRelations(): array
     {
         return [
@@ -48,6 +55,7 @@ class BrandResource extends Resource
         ];
     }
 
+    // Mapping halaman resource.
     public static function getPages(): array
     {
         return [
@@ -58,6 +66,7 @@ class BrandResource extends Resource
         ];
     }
 
+    // Mengambil query record tanpa scope soft delete bawaan.
     public static function getRecordRouteBindingEloquentQuery(): Builder
     {
         return parent::getRecordRouteBindingEloquentQuery()

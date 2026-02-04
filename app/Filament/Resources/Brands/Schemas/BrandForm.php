@@ -12,9 +12,12 @@ class BrandForm
     {
         return $schema
             ->components([
+                // Input nama brand: wajib diisi agar setiap brand punya identitas.
                 TextInput::make('name')
                     ->required()
                     ,
+                // Upload logo brand: hanya gambar, disimpan di folder brands, ukuran maks 1MB.
+                // Field ini wajib, namun menerima nilai null saat tidak ada unggahan.
                 FileUpload::make('logo')
                     ->image()
                     ->directory( 'brands')

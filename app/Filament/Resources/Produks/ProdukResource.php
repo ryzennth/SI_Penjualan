@@ -20,27 +20,34 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ProdukResource extends Resource
 {
+    // Model utama yang dikelola oleh resource ini.
     protected static ?string $model = Produk::class;
 
+    // Ikon navigasi di sidebar untuk menu Produk.
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBookOpen;
 
+    // Atribut yang ditampilkan sebagai judul record.
     protected static ?string $recordTitleAttribute = 'Produk';
 
+    // Konfigurasi form untuk create/edit produk.
     public static function form(Schema $schema): Schema
     {
         return ProdukForm::configure($schema);
     }
 
+    // Konfigurasi infolist untuk tampilan detail produk.
     public static function infolist(Schema $schema): Schema
     {
         return ProdukInfolist::configure($schema);
     }
 
+    // Konfigurasi tabel daftar produk.
     public static function table(Table $table): Table
     {
         return ProduksTable::configure($table);
     }
 
+    // Relasi resource (kosong jika tidak ada).
     public static function getRelations(): array
     {
         return [
@@ -48,6 +55,7 @@ class ProdukResource extends Resource
         ];
     }
 
+    // Mapping halaman resource.
     public static function getPages(): array
     {
         return [
@@ -58,6 +66,7 @@ class ProdukResource extends Resource
         ];
     }
 
+    // Mengambil query record tanpa scope soft delete bawaan.
     public static function getRecordRouteBindingEloquentQuery(): Builder
     {
         return parent::getRecordRouteBindingEloquentQuery()

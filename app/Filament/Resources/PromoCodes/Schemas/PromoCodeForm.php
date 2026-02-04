@@ -12,13 +12,16 @@ class PromoCodeForm
     {
         return $schema
             ->components([
+                // Layout form promo code dibagi 2 kolom.
                 Grid::make(2)->schema([
                 
+                // Kode promo yang akan digunakan pelanggan.
                 TextInput::make('code')
                     ->label('Code')
                     ->required()
                     ->maxLength(50),
 
+                // Nominal diskon dalam Rupiah.
                 TextInput::make('discount_amount')
                     ->label('Discount amount')
                     ->prefix('IDR')
