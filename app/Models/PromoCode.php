@@ -10,6 +10,7 @@ class PromoCode extends Model
 {
     use HasFactory, SoftDeletes;
 
+    // Kolom yang boleh diisi massal.
     protected $fillable = [
         'code',
         'discount_amount',

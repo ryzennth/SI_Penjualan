@@ -12,11 +12,13 @@ class ProdukPhoto extends Model
 {
     use HasFactory, SoftDeletes;
 
+    // Kolom yang boleh diisi massal.
     protected $fillable = [
         'photo',
         'produk_id',
     ];
 
+    // Relasi ke produk pemilik foto.
     public function produk(): BelongsTo
     {
         return $this->belongsTo(Produk::class, foreignKey: 'produk_id');

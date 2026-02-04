@@ -11,6 +11,7 @@ class ProductTransaction extends Model
 {
     use HasFactory, SoftDeletes;
 
+    // Kolom yang boleh diisi massal.
     protected $fillable = [
         'name',
         'phone',
@@ -29,6 +30,7 @@ class ProductTransaction extends Model
         'proof',
     ];
 
+    // Membuat booking ID unik untuk transaksi.
     public static function generateUniqueTrxId()
     {
         $prefix = 'TJH';
@@ -38,11 +40,13 @@ class ProductTransaction extends Model
         return $randomString;
     }
 
+    // Relasi ke produk yang dibeli.
     public function produk(): BelongsTo
     {
         return $this->belongsTo(Produk::class, 'produk_id');
     }
 
+    // Relasi ke promo code yang digunakan.
     public function promoCode(): BelongsTo
     {
         return $this->belongsTo(PromoCode::class, 'promo_code_id');

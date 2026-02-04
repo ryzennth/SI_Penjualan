@@ -12,11 +12,13 @@ class ProdukSize extends Model
 {
     use HasFactory, SoftDeletes;
 
+    // Kolom yang boleh diisi massal.
     protected $fillable = [
         'size',
         'produk_id',
     ];
 
+    // Relasi ke produk pemilik ukuran.
     public function produk(): BelongsTo
     {
         return $this->belongsTo(Produk::class, foreignKey: 'produk_id');

@@ -12,18 +12,21 @@ class Brand extends Model
 {
     use HasFactory, SoftDeletes;
 
+    // Kolom yang boleh diisi massal.
     protected $fillable = [
         'name',
         'slug',
         'logo',
     ];
 
+    // Otomatis membuat slug saat nama di-set.
     public function setNameAttribute($value)
     {
         $this->attributes['name'] = $value;
         $this->attributes['slug'] = Str::slug($value);
     }
 
+    // Relasi ke produk yang berada di bawah brand ini.
     public function produks(): HasMany
     {
         return $this->hasMany(Produk::class);
