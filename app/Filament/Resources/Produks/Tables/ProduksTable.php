@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Produks\Tables;
 use Filament\Tables\Table;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
@@ -78,6 +79,8 @@ class ProduksTable
                 ViewAction::make(),
                 // Aksi edit produk.
                 EditAction::make(),
+                // Aksi hapus produk
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 // Kumpulan aksi massal untuk data terpilih.

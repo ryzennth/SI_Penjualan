@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Brands\Tables;
 use Filament\Tables\Table;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
@@ -53,6 +54,8 @@ class BrandsTable
                 ViewAction::make(),
                 // Aksi edit data brand.
                 EditAction::make(),
+                // Aksi hapus data brand
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 // Kumpulan aksi massal untuk data yang dipilih.
