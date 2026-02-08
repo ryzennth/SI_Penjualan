@@ -25,98 +25,123 @@ class ProductTransactionForm
                 // Wizard untuk membagi form transaksi ke beberapa langkah.
                 Wizard::make([
                     Step::make('Product and Price')
-                    ->components([
-                        // Pilih produk, lalu hitung otomatis harga, subtotal, diskon, dan ukuran yang tersedia.
-                        Select::make('produk_id')
-                            ->relationship('produk', 'name')
-                            ->required()
-                            ->searchable()
-                            ->live()
-                            ->preload()
-                            ->afterStateUpdated( function ($state, callable $get, callable $set) {
-                                $produk = Produk::find( $state);
-                                $price = $produk ? $produk->price : 0;
-                                $quantity = $get('quantity') ?? 1;
-                                $sub_total_amount = $price * $quantity;
+                        ->components([
+                            // === 1. SELECT PRODUK ===
+                            Select::make('produk_id')
+                                ->relationship('produk', 'name')
+                                ->required()
+                                ->searchable()
+                                ->preload()
+                                ->live()
+                                ->afterStateUpdated(function ($state, callable $get, callable $set) {
+                                    $produk = Produk::find($state);
+                                    
+                                    // Hitung Harga
+                                    $price = $produk ? $produk->price : 0;
+                                    $quantity = $get('quantity') ?? 1;
+                                    $sub_total_amount = $price * $quantity;
 
-                                $set('price', $price);
-                                $set('sub_total_amount', $sub_total_amount);
-                            
-                                $discount = $get('promo_code_id') ?? 0;
-                                $grand_total_amount = $sub_total_amount - $discount;
-                                $set('grand_total_amount', $grand_total_amount);
+                                    $set('price', $price);
+                                    $set('sub_total_amount', $sub_total_amount);
 
-                                $sizes = $produk ? $produk->sizes->pluck('size', 'id')->toArray() : [];
-                                $set('produk_size', $sizes);
+                                    // Hitung Grand Total
+                                    $discount = $get('discount_amount') ?? 0; // Pastikan nama field konsisten
+                                    $grand_total_amount = $sub_total_amount - $discount;
+                                    $set('grand_total_amount', $grand_total_amount);
 
-                            })
+                                    // === PERBAIKAN DISINI ===
+                                    // Jangan set 'produk_size' dengan array options. 
+                                    // Cukup reset jadi null agar user memilih ulang.
+                                    $set('produk_size', null); 
+                                }),
+                                // Hapus afterStateHydrated yang error tadi.
 
-                            // Saat edit data, preload ukuran produk sesuai produk yang sudah dipilih.
-                            ->afterStateHydrated( function ($state, callable $get, callable $set) {
-                                $produkId = $state;
-                                if ($produkId) {
-                                    $produk = Produk::find($produkId);
-                                    $sizes = $produk ? $produk->sizes->pluck('size', 'id')->toArray() : [];
-                                    $set('produk_size', $sizes);                              
-                            
-                            }
-                        }),
+                            // === 2. SELECT UKURAN (Dynamic Options) ===
+                            Select::make('produk_size')
+                                ->label('Ukuran')
+                                ->options(function (callable $get) {
+                                    // Ambil ID produk yang sedang dipilih
+                                    $produkId = $get('produk_id');
 
-                        // Pilih ukuran produk dari daftar yang diisi otomatis.
-                        Select::make('produk_size')
-                            ->options( function (callable $get) {
-                                $sizes = $get('produk_size');
-                                return is_array($sizes) ? $sizes : [];
-                            })
-                            ->required()
-                            ->live(),
+                                    if (!$produkId) {
+                                        return [];
+                                    }
 
-                        // Jumlah produk, memicu perhitungan subtotal dan grand total.
-                        Select::make('quantity')
-                            ->required()
-                            
-                            ->prefix( 'Qty')
-                            ->live()
-                            ->afterStateUpdated( function ($state, callable $get, callable $set) {
-                                $price = $get('price');
-                                $quantity = $state;
-                                $sub_total_amount = $price * $quantity;
-                                $set('sub_total_amount', $sub_total_amount);
-                                $discount = $get('discount') ?? 0;
-                                $grand_total_amount = $sub_total_amount - $discount;
-                                $set('grand_total_amount', $grand_total_amount);
+                                    // Ambil daftar ukuran berdasarkan produk tersebut
+                                    // Pastikan relasi 'sizes' ada di model Produk
+                                    return Produk::find($produkId)
+                                        ?->sizes
+                                        ->pluck('size', 'id')
+                                        ->toArray() ?? [];
+                                })
+                                ->required()
+                                ->live(), // Tetap live jika berpengaruh ke stock (opsional)
 
-                            }),
+                            // === 3. QUANTITY ===
+                            Select::make('quantity')
+                                ->required()
+                                ->prefix('Qty')
+                                ->options([
+                                    1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 
+                                    // ... tambahkan sesuai kebutuhan atau ganti jadi TextInput numeric
+                                ])
+                                ->default(1)
+                                ->live()
+                                ->afterStateUpdated(function ($state, callable $get, callable $set) {
+                                    // Ambil harga yang sudah diset sebelumnya
+                                    $produkId = $get('produk_id');
+                                    $price = $produkId ? (Produk::find($produkId)->price ?? 0) : 0;
+                                    
+                                    $quantity = intval($state);
+                                    $sub_total_amount = $price * $quantity;
+                                    
+                                    $set('sub_total_amount', $sub_total_amount);
+                                    
+                                    $discount = $get('discount_amount') ?? 0;
+                                    $grand_total_amount = $sub_total_amount - $discount;
+                                    $set('grand_total_amount', $grand_total_amount);
+                                }),
 
-                        // Pilih promo code untuk mengisi diskon otomatis.
-                        Select::make('promo_code_id')
-                            ->relationship('promoCode', 'id')
-                            ->required()
-                            ->preload()
-                            ->live()
-                            ->afterStateUpdated( function ($state, callable $get, callable $set) {
-                                $sub_total_amount = $get('sub_total_amount');
-                                $promoCode = PromoCode::find( $state);
-                                $discount = $promoCode ? $promoCode->discount_amount : 0;
-                                $set('discount_amount', $discount);
-                                $grand_total_amount = $sub_total_amount - $discount;
-                                $set('grand_total_amount', $grand_total_amount);
-                            }),
+                            // === 4. PROMO CODE ===
+                            Select::make('promo_code_id')
+                                ->relationship('promoCode', 'code') // Biasanya fieldnya 'code' bukan 'id' untuk label
+                                ->preload()
+                                ->live()
+                                ->afterStateUpdated(function ($state, callable $get, callable $set) {
+                                    $sub_total_amount = $get('sub_total_amount') ?? 0;
+                                    $promoCode = PromoCode::find($state);
+                                    
+                                    $discount = $promoCode ? $promoCode->discount_amount : 0;
+                                    
+                                    $set('discount_amount', $discount);
+                                    
+                                    $grand_total_amount = $sub_total_amount - $discount;
+                                    $set('grand_total_amount', max($grand_total_amount, 0)); // Cegah minus
+                                }),
 
-                            // Subtotal otomatis dari harga x jumlah.
+                            // === 5. HASIL PERHITUNGAN ===
                             TextInput::make('sub_total_amount')
+                                ->label('Sub Total')
                                 ->required()
                                 ->numeric()
                                 ->readOnly()
-                                ->prefix( 'IDR'),
-                            // Nominal diskon yang diterapkan.
-                            TextInput::make( 'discount_amount')
+                                ->prefix('IDR'),
+
+                            TextInput::make('discount_amount')
                                 ->label('Discount Amount')
                                 ->required()
                                 ->numeric()
-                                ->prefix( 'IDR'),
-
-                    ]),
+                                ->readOnly() // Sebaiknya readOnly karena hasil dari promo code
+                                ->default(0)
+                                ->prefix('IDR'),
+                                
+                            TextInput::make('grand_total_amount')
+                                ->label('Grand Total')
+                                ->required()
+                                ->numeric()
+                                ->readOnly()
+                                ->prefix('IDR'),
+                        ]),
                 
 
                 Step::make( 'Customer Information')
